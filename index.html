@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#f8fafc">
+  <title>ABSINA Wallbox 11 kW – Mobile Guide</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+      padding: 12px 14px 40px;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      max-width: 540px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* iOS-like Header */
+    .header-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+      border: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-title h1 {
+      font-size: 19px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-casing {
+      background: #1e3a8a;
+      color: #ffffff;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2.5px 7px;
+      border-radius: 6px;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+    }
+
+    .header-title p {
+      font-size: 12.5px;
+      color: #64748b;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    .btn-icon-print {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      color: #0f172a;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    /* Tab Navigation (iOS segmented control style) */
+    .segmented-control {
+      background: #e2e8f0;
+      padding: 3px;
+      border-radius: 12px;
+      display: flex;
+      gap: 2px;
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+    }
+
+    .segment-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 8px 2px;
+      border-radius: 9px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.18s ease;
+    }
+
+    .segment-btn.active {
+      background: #ffffff;
+      color: #0f172a;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+      font-weight: 700;
+    }
+
+    /* Content Cards */
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+      border: 1px solid #e2e8f0;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .card-title .dot-icon {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #2563eb;
+    }
+
+    /* Section Visibility */
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* Diagram Styles */
+    .diagram-wrapper {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 14px 8px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .diagram-svg {
+      width: 100%;
+      max-width: 290px;
+      height: auto;
+      display: block;
+    }
+
+    .legend-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 7px;
+      margin-top: 14px;
+      width: 100%;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 13.5px;
+      color: #1e293b;
+    }
+
+    .num-pill {
+      min-width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #2563eb;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 11.5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Steps */
+    .step-item {
+      display: flex;
+      gap: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+
+    .step-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .step-number {
+      width: 26px;
+      height: 26px;
+      background: #2563eb;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 13px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-body h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 2px;
+    }
+
+    .step-body p {
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.4;
+    }
+
+    /* Amperage and Timer Gauges */
+    .pill-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+      margin: 10px 0;
+    }
+
+    .amp-pill {
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 8px 2px;
+      text-align: center;
+    }
+
+    .amp-pill.highlight {
+      background: #ecfdf5;
+      border-color: #10b981;
+    }
+
+    .amp-val {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .amp-led {
+      font-size: 10px;
+      font-weight: 600;
+      color: #16a34a;
+      margin-top: 2px;
+    }
+
+    .timer-pill {
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 8px 2px;
+      text-align: center;
+    }
+
+    .timer-val {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .timer-led {
+      font-size: 10px;
+      font-weight: 600;
+      color: #7c3aed;
+      margin-top: 2px;
+    }
+
+    .callout-box {
+      border-radius: 12px;
+      padding: 11px 13px;
+      font-size: 13px;
+      line-height: 1.4;
+      margin-top: 10px;
+    }
+
+    .callout-blue {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+    }
+
+    .callout-amber {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+    }
+
+    /* LED Status Rows */
+    .status-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      margin-bottom: 7px;
+    }
+
+    .status-indicator {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .bg-grn { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.6); }
+    .bg-blu { background: #3b82f6; box-shadow: 0 0 8px rgba(59,130,246,0.6); }
+    .bg-pur { background: #a855f7; box-shadow: 0 0 8px rgba(168,85,247,0.6); }
+
+    .status-text strong {
+      font-size: 13.5px;
+      color: #0f172a;
+      display: block;
+    }
+
+    .status-text span {
+      font-size: 12.5px;
+      color: #64748b;
+    }
+
+    /* Error Code Cards */
+    .error-card {
+      border: 1px solid #fed7aa;
+      background: #fffaf5;
+      border-radius: 12px;
+      padding: 11px 13px;
+      margin-bottom: 8px;
+    }
+
+    .error-card.severe {
+      border-color: #fecaca;
+      background: #fef2f2;
+    }
+
+    .error-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .blink-badge {
+      background: #dc2626;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 6px;
+      letter-spacing: 0.3px;
+    }
+
+    .error-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #991b1b;
+    }
+
+    .error-desc {
+      font-size: 12.5px;
+      color: #451a03;
+      line-height: 1.35;
+    }
+
+    .error-action {
+      margin-top: 4px;
+      font-size: 12.5px;
+      color: #1e293b;
+      font-weight: 500;
+    }
+
+    /* Clean Print Support */
+    @media print {
+      body {
+        background: #ffffff !important;
+        padding: 0 !important;
+      }
+      .app-container {
+        max-width: 100% !important;
+      }
+      .no-print, .segmented-control {
+        display: none !important;
+      }
+      .tab-content {
+        display: flex !important;
+        page-break-inside: avoid;
+        margin-bottom: 16px;
+      }
+      .card {
+        box-shadow: none !important;
+        border: 1px solid #cbd5e1 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- Top App Header -->
+    <header class="header-card">
+      <div class="header-title">
+        <h1>
+          ABSINA Wallbox
+          <span class="badge-casing">11 kW</span>
+        </h1>
+        <p>16A CEE • Garagen-Schnellanleitung</p>
+      </div>
+      <button class="btn-icon-print no-print" onclick="window.print()">
+        🖨️ Print
+      </button>
+    </header>
+
+    <!-- iOS Native Segmented Tabs Navigation -->
+    <nav class="segmented-control no-print" aria-label="Sektion auswählen">
+      <button class="segment-btn active" onclick="switchTab('tab-charging', this)">Laden</button>
+      <button class="segment-btn" onclick="switchTab('tab-tasten', this)">Tasten</button>
+      <button class="segment-btn" onclick="switchTab('tab-leds', this)">LEDs</button>
+      <button class="segment-btn" onclick="switchTab('tab-errors', this)">Fehler</button>
+      <button class="segment-btn" onclick="switchTab('tab-device', this)">Gerät</button>
+    </nav>
+
+    <!-- TAB 1: LADEVORGANG -->
+    <section id="tab-charging" class="tab-content active">
+      <div class="card">
+        <h2 class="card-title"><span class="dot-icon"></span>Ladevorgang Schritt für Schritt</h2>
+        
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <div class="step-body">
+            <h4>Kabel anstecken</h4>
+            <p>Ladekabel <strong>zuerst an der Wallbox</strong> einstecken, danach am Fahrzeug anschließen.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <div class="step-body">
+            <h4>Starten &amp; Freigeben</h4>
+            <p>• <strong>RFID aktiv:</strong> Chip/Karte an das Antennensymbol ((•)) halten.<br>
+               • <strong>RFID aus:</strong> Ladevorgang startet selbstständig.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <div class="step-body">
+            <h4>Ladevorgang beenden</h4>
+            <p>Kabel am Fahrzeug entriegeln oder RFID-Karte erneut vorhalten. <strong>Erst am Auto abstecken</strong>; Kabel kann in der Wallbox bleiben.</p>
+          </div>
+        </div>
+
+        <div class="callout-box callout-blue">
+          💡 <strong>Tipp:</strong> Änderungen an Stromstärke oder Verzögerung können nur vorgenommen werden, wenn <strong>kein aktiver Ladevorgang</strong> läuft (Bereitschaftsmodus).
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: TASTEN (A & T) -->
+    <section id="tab-tasten" class="tab-content">
+      <div class="card">
+        <h2 class="card-title"><span class="dot-icon"></span>Ladestrom wählen • Taste (A)</h2>
+        <p style="font-size: 13px; color: #64748b;">Taste <strong>(A)</strong> mehrfach drücken, um den gewünschten Ladestrom zu wählen (Grüne LEDs):</p>
+        
+        <div class="pill-grid">
+          <div class="amp-pill">
+            <div class="amp-val">6A</div>
+            <div class="amp-led">LED 1</div>
+          </div>
+          <div class="amp-pill">
+            <div class="amp-val">8A</div>
+            <div class="amp-led">LED 1-2</div>
+          </div>
+          <div class="amp-pill">
+            <div class="amp-val">10A</div>
+            <div class="amp-led">LED 1-3</div>
+          </div>
+          <div class="amp-pill">
+            <div class="amp-val">13A</div>
+            <div class="amp-led">LED 1-4</div>
+          </div>
+          <div class="amp-pill highlight">
+            <div class="amp-val" style="color: #065f46;">16A</div>
+            <div class="amp-led" style="font-weight: 800;">LED 1-5</div>
+          </div>
+        </div>
+
+        <div style="font-size: 12.5px; color: #475569; margin-top: 4px;">
+          • 16A = 11 kW max. Ladeleistung (3-phasig)
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title"><span class="dot-icon" style="background:#7c3aed;"></span>Startverzögerung • Taste (T)</h2>
+        <p style="font-size: 13px; color: #64748b;">Taste <strong>(T)</strong> mehrfach drücken für Nachtstrom-Timer (Lila LEDs):</p>
+        
+        <div class="pill-grid">
+          <div class="timer-pill">
+            <div class="timer-val">2h</div>
+            <div class="timer-led">LED 1</div>
+          </div>
+          <div class="timer-pill">
+            <div class="timer-val">4h</div>
+            <div class="timer-led">LED 1-2</div>
+          </div>
+          <div class="timer-pill">
+            <div class="timer-val">6h</div>
+            <div class="timer-led">LED 1-3</div>
+          </div>
+          <div class="timer-pill">
+            <div class="timer-val">8h</div>
+            <div class="timer-led">LED 1-4</div>
+          </div>
+          <div class="timer-pill">
+            <div class="timer-val">10h</div>
+            <div class="timer-led">LED 1-5</div>
+          </div>
+        </div>
+
+        <div class="callout-box callout-amber">
+          ⏱️ <strong>Timer löschen:</strong> Taste <strong>(T) für 5 Sekunden</strong> gedrückt halten. LED 1 blinkt 2-mal lila zur Bestätigung.
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title"><span class="dot-icon" style="background:#ea580c;"></span>RFID-Schutz An / Aus schalten</h2>
+        <p style="font-size: 13px; color: #334155; line-height: 1.45;">
+          1. Taste <strong>(A) für 5 Sekunden</strong> gedrückt halten.<br>
+          2. Die LEDs 1–5 blinken 10 Sekunden lang <strong>orange</strong>.<br>
+          3. Halte währenddessen deine RFID-Karte an das Sensorsymbol.<br>
+          • <strong>1x orange blinken:</strong> Freier Zugang (Ohne RFID / Plug &amp; Charge)<br>
+          • <strong>3x orange blinken:</strong> RFID-Schutz EIN (Karte erforderlich)
+        </p>
+      </div>
+    </section>
+
+    <!-- TAB 3: LED STATUS -->
+    <section id="tab-leds" class="tab-content">
+      <div class="card">
+        <h2 class="card-title"><span class="dot-icon"></span>LED-Statusanzeigen im Betrieb</h2>
+        
+        <div class="status-card">
+          <span class="status-indicator bg-grn"></span>
+          <div class="status-text">
+            <strong>LED 1–5 leuchten dauerhaft grün</strong>
+            <span>Bereitschaft (Standby). Bereit zum Anstecken.</span>
+          </div>
+        </div>
+
+        <div class="status-card">
+          <span class="status-indicator bg-grn" style="opacity: 0.5;"></span>
+          <div class="status-text">
+            <strong>LED 1–5 blinken grün</strong>
+            <span>RFID-Freischaltung erforderlich. Karte an Sensor halten.</span>
+          </div>
+        </div>
+
+        <div class="status-card">
+          <span class="status-indicator bg-blu"></span>
+          <div class="status-text">
+            <strong>LEDs pulsieren blau</strong>
+            <span>Ladevorgang aktiv (Anzahl LEDs entspricht gewähltem Strom).</span>
+          </div>
+        </div>
+
+        <div class="status-card">
+          <span class="status-indicator bg-blu" style="box-shadow: 0 0 10px #2563eb;"></span>
+          <div class="status-text">
+            <strong>LED 1–5 leuchten dauerhaft blau</strong>
+            <span>Ladevorgang abgeschlossen. Fahrzeugbatterie ist voll.</span>
+          </div>
+        </div>
+
+        <div class="status-card">
+          <span class="status-indicator bg-pur"></span>
+          <div class="status-text">
+            <strong>LEDs blinken blau periodisch</strong>
+            <span>Startverzögerung aktiv. Ladevorgang startet nach Timer.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: FEHLERDIAGNOSE -->
+    <section id="tab-errors" class="tab-content">
+      <div class="card">
+        <h2 class="card-title"><span class="dot-icon" style="background:#dc2626;"></span>Fehlerdiagnose (Rote Blinkcodes)</h2>
+        
+        <div class="error-card">
+          <div class="error-header">
+            <span class="error-name">Error CP</span>
+            <span class="blink-badge">1x Rot</span>
+          </div>
+          <div class="error-desc">Kommunikations- oder Kabelkontaktfehler.</div>
+          <div class="error-action">👉 <strong>Lösung:</strong> Stecker an Box und Auto fest andrücken. Ladekabel auf Beschädigungen prüfen.</div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-header">
+            <span class="error-name">Eingangsspannung zu niedrig</span>
+            <span class="blink-badge">2x Rot</span>
+          </div>
+          <div class="error-desc">Unterspannung an der Versorgungsleitung.</div>
+          <div class="error-action">👉 <strong>Lösung:</strong> CEE-Steckdose und Hausanschluss-Sicherungen prüfen lassen.</div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-header">
+            <span class="error-name">Eingangsspannung zu hoch</span>
+            <span class="blink-badge">3x Rot</span>
+          </div>
+          <div class="error-desc">Überspannung im Versorgungsnetz erkannt.</div>
+          <div class="error-action">👉 <strong>Lösung:</strong> Wallbox schaltet ab. Netzanschluss durch Fachkraft überprüfen lassen.</div>
+        </div>
+
+        <div class="error-card severe">
+          <div class="error-header">
+            <span class="error-name" style="color:#b91c1c;">Leckstrom / Fehlerstrom</span>
+            <span class="blink-badge">4x Rot</span>
+          </div>
+          <div class="error-desc"><strong>Achtung Lebensgefahr!</strong> Fehlerstrom registriert.</div>
+          <div class="error-action">👉 <strong>Lösung:</strong> Sofort vom Netz trennen! Elektroinstallation durch Fach-Elektriker prüfen lassen.</div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-header">
+            <span class="error-name">Eingangsstrom zu hoch</span>
+            <span class="blink-badge">5x Rot</span>
+          </div>
+          <div class="error-desc">Überstrom erkannt. Wallbox schaltet automatisch ab.</div>
+          <div class="error-action">👉 <strong>Lösung:</strong> Installation und Typ-2-Kabel auf Beschädigung kontrollieren.</div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-header">
+            <span class="error-name">Übertemperatur (&gt; 60 °C)</span>
+            <span class="blink-badge">6x Rot</span>
+          </div>
+          <div class="error-desc">Temperatur im Gehäuse übersteigt den Grenzwert.</div>
+          <div class="error-action">👉 <strong>Lösung:</strong> Direkte Sonneneinstrahlung vermeiden. Wallbox im Schatten abkühlen lassen.</div>
+        </div>
+
+        <div class="error-card">
+          <div class="error-header">
+            <span class="error-name">Reset-Fehler / Taster blockiert</span>
+            <span class="blink-badge">7x Rot</span>
+          </div>
+          <div class="error-desc">Der Reset-Taster ist dauerhaft aktiviert.</div>
+          <div class="error-action">👉 <strong>Lösung:</strong> Prüfen, ob der rechte <strong>Reset-Schalter (5)</strong> eingedrückt oder verklemmt ist.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: GERÄTEÜBERSICHT -->
+    <section id="tab-device" class="tab-content">
+      <div class="card">
+        <h2 class="card-title"><span class="dot-icon"></span>9. Produktübersicht (Schematische Ansicht)</h2>
+        
+        <div class="diagram-wrapper">
+          <!-- Vector SVG Illustration scaled for Mobile screens -->
+          <svg class="diagram-svg" viewBox="0 0 300 370" xmlns="http://www.w3.org/2000/svg">
+            <!-- CEE Supply Cable (1) -->
+            <path d="M 120 150 L 120 35 Q 120 15 140 15 L 200 15 Q 220 15 220 35 L 220 200" 
+                  fill="none" stroke="#334155" stroke-width="12" stroke-linecap="round"/>
+            <path d="M 120 150 L 120 35 Q 120 15 140 15 L 200 15 Q 220 15 220 35 L 220 200" 
+                  fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+            
+            <!-- CEE Plug (6) -->
+            <rect x="210" y="200" width="20" height="12" rx="2" fill="#0f172a"/>
+            <rect x="207" y="212" width="26" height="52" rx="3" fill="#dc2626" stroke="#991b1b" stroke-width="1.2"/>
+            <rect x="203" y="232" width="34" height="9" rx="1.5" fill="#b91c1c"/>
+            <rect x="210" y="264" width="20" height="20" rx="2" fill="#1e293b"/>
+            <circle cx="220" cy="274" r="2.5" fill="#f8fafc"/>
+
+            <!-- Main Wallbox Casing -->
+            <path d="M 70 160 
+                     C 70 150, 170 150, 170 160 
+                     C 185 205, 185 275, 170 320 
+                     C 160 342, 80 342, 70 320 
+                     C 55 275, 55 205, 70 160 Z" 
+                  fill="#ffffff" stroke="#475569" stroke-width="2" />
+
+            <text x="120" y="178" text-anchor="middle" font-size="8.5" font-weight="900" fill="#0f172a" letter-spacing="0.5">ABSINA</text>
+
+            <!-- LED Strip (2) -->
+            <rect x="118.5" y="185" width="3" height="30" rx="1.5" fill="#0f172a"/>
+            <circle cx="120" cy="189" r="1.3" fill="#22c55e"/>
+            <circle cx="120" cy="195" r="1.3" fill="#22c55e"/>
+            <circle cx="120" cy="200" r="1.3" fill="#22c55e"/>
+            <circle cx="120" cy="206" r="1.3" fill="#22c55e"/>
+            <circle cx="120" cy="211" r="1.3" fill="#22c55e"/>
+
+            <!-- Buttons T & A -->
+            <circle cx="96" cy="200" r="8" fill="#f8fafc" stroke="#64748b" stroke-width="1.2"/>
+            <text x="96" y="203.5" text-anchor="middle" font-size="8" font-weight="700" fill="#0f172a">T</text>
+
+            <circle cx="144" cy="200" r="8" fill="#f8fafc" stroke="#64748b" stroke-width="1.2"/>
+            <text x="144" y="203.5" text-anchor="middle" font-size="8" font-weight="700" fill="#0f172a">A</text>
+
+            <!-- RFID Symbol (3) -->
+            <circle cx="120" cy="232" r="1.5" fill="#0f172a"/>
+            <path d="M 116 228 A 5 5 0 0 0 116 236" fill="none" stroke="#0f172a" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M 124 228 A 5 5 0 0 1 124 236" fill="none" stroke="#0f172a" stroke-width="1.2" stroke-linecap="round"/>
+
+            <!-- Type 2 Cover (4) -->
+            <circle cx="120" cy="288" r="22" fill="#334155" stroke="#0f172a" stroke-width="1.5"/>
+            <rect x="111" y="278" width="18" height="20" rx="3" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+            <!-- QR code (9) -->
+            <rect x="115" y="282" width="10" height="10" fill="#0f172a"/>
+
+            <!-- Right-side Reset Switch (5) -->
+            <rect x="177" y="206" width="3.5" height="12" rx="1.5" fill="#dc2626"/>
+
+            <!-- Numbered Pins -->
+            <!-- 1 -->
+            <circle cx="170" cy="28" r="7" fill="#2563eb" stroke="#ffffff" stroke-width="1.2"/>
+            <text x="170" y="31" text-anchor="middle" font-size="8" font-weight="700" fill="#ffffff">1</text>
+
+            <!-- 2 -->
+            <circle cx="50" cy="188" r="7" fill="#2563eb" stroke="#ffffff" stroke-width="1.2"/>
+            <text x="50" y="191" text-anchor="middle" font-size="8" font-weight="700" fill="#ffffff">2</text>
+            <line x1="57" y1="188" x2="114" y2="197" stroke="#2563eb" stroke-width="1" stroke-dasharray="2 2"/>
+
+            <!-- 7 -->
+            <circle cx="50" cy="214" r="7" fill="#2563eb" stroke="#ffffff" stroke-width="1.2"/>
+            <text x="50" y="217" text-anchor="middle" font-size="8" font-weight="700" fill="#ffffff">7</text>
+            <line x1="57" y1="214" x2="88" y2="204" stroke="#2563eb" stroke-width="1" stroke-dasharray="2 2"/>
+
+            <!-- 3 -->
+            <circle cx="50" cy="240" r="7" fill="#2563eb" stroke="#ffffff" stroke-width="1.2"/>
+            <text x="50" y="243" text-anchor="middle" font-size="8" font-weight="700" fill="#ffffff">3</text>
+            <line x1="57" y1="240" x2="108" y2="233" stroke="#2563eb" stroke-width="1" stroke-dasharray="2 2"/>
+
+            <!-- 4 -->
+            <circle cx="50" cy="290" r="7" fill="#2563eb" stroke="#ffffff" stroke-width="1.2"/>
+            <text x="50" y="293" text-anchor="middle" font-size="8" font-weight="700" fill="#ffffff">4</text>
+            <line x1="57" y1="290" x2="98" y2="288" stroke="#2563eb" stroke-width="1" stroke-dasharray="2 2"/>
+
+            <!-- 8 -->
+            <circle cx="190" cy="188" r="7" fill="#2563eb" stroke="#ffffff" stroke-width="1.2"/>
+            <text x="190" y="191" text-anchor="middle" font-size="8" font-weight="700" fill="#ffffff">8</text>
+            <line x1="183" y1="188" x2="152" y2="198" stroke="#2563eb" stroke-width="1" stroke-dasharray="2 2"/>
+
+            <!-- 5 -->
+            <circle cx="198" cy="214" r="7" fill="#2563eb" stroke="#ffffff" stroke-width="1.2"/>
+            <text x="198" y="217" text-anchor="middle" font-size="8" font-weight="700" fill="#ffffff">5</text>
+            <line x1="191" y1="214" x2="181" y2="212" stroke="#2563eb" stroke-width="1" stroke-dasharray="2 2"/>
+
+            <!-- 6 -->
+            <circle cx="185" cy="265" r="7" fill="#2563eb" stroke="#ffffff" stroke-width="1.2"/>
+            <text x="185" y="268" text-anchor="middle" font-size="8" font-weight="700" fill="#ffffff">6</text>
+            <line x1="192" y1="265" x2="207" y2="255" stroke="#2563eb" stroke-width="1" stroke-dasharray="2 2"/>
+
+            <!-- 9 -->
+            <circle cx="120" cy="345" r="7" fill="#2563eb" stroke="#ffffff" stroke-width="1.2"/>
+            <text x="120" y="348" text-anchor="middle" font-size="8" font-weight="700" fill="#ffffff">9</text>
+            <line x1="120" y1="338" x2="120" y2="310" stroke="#2563eb" stroke-width="1" stroke-dasharray="2 2"/>
+          </svg>
+        </div>
+
+        <div class="legend-list">
+          <div class="legend-row">
+            <span class="num-pill">1</span>
+            <div><strong>Anschlussleitung:</strong> Verbindet Box mit CEE-Stecker</div>
+          </div>
+          <div class="legend-row">
+            <span class="num-pill">2</span>
+            <div><strong>LED-Statusanzeige:</strong> 5 LEDs für Status &amp; Strom</div>
+          </div>
+          <div class="legend-row">
+            <span class="num-pill">3</span>
+            <div><strong>RFID-Sensor:</strong> Liest RFID-Karten ein ((•))</div>
+          </div>
+          <div class="legend-row">
+            <span class="num-pill">4</span>
+            <div><strong>Abdeckung Typ-2:</strong> Schutzdeckel für Ladebuchse</div>
+          </div>
+          <div class="legend-row">
+            <span class="num-pill">5</span>
+            <div><strong>Reset-Schalter:</strong> Taster an rechter Gehäuseseite</div>
+          </div>
+          <div class="legend-row">
+            <span class="num-pill">6</span>
+            <div><strong>CEE-Stecker:</strong> 16A / 400V Starkstrom-Anschluss</div>
+          </div>
+          <div class="legend-row">
+            <span class="num-pill">7</span>
+            <div><strong>Bedienfeld (T):</strong> Lade-Startverzögerung</div>
+          </div>
+          <div class="legend-row">
+            <span class="num-pill">8</span>
+            <div><strong>Bedienfeld (A):</strong> Ladestrom- &amp; RFID-Wahl</div>
+          </div>
+          <div class="legend-row">
+            <span class="num-pill">9</span>
+            <div><strong>Digitale Anleitung:</strong> QR-Code auf Deckel</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    // Tab switching logic
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.segment-btn').forEach(b => {
+        b.classList.remove('active');
+      });
+
+      const target = document.getElementById(tabId);
+      if (target) {
+        target.classList.add('active');
+      }
+      btn.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
